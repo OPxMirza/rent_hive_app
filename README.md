@@ -128,8 +128,8 @@ test/security.dart
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/yourrepo.git
-cd yourrepo
+git clone https://github.com/OPxMirza/rent_hive_app.git
+cd rent_hive_app
 ```
 
 ### 2. Install dependencies
