@@ -401,7 +401,7 @@ class _EditProductScreenState extends State<EditProductScreen>
                 child: Center(child: CircularProgressIndicator()),
               )
               : DropdownButtonFormField<String>(
-                value:
+                initialValue:
                     categories.contains(_selectedCategory)
                         ? _selectedCategory
                         : null,

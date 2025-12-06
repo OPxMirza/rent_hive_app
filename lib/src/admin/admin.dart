@@ -91,7 +91,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int _totalOrders = 0;
   int _totalProducts = 0;
   int _totalCategories = 0;
-  double _totalRevenue = 0.0;
+  final double _totalRevenue = 0.0;
   List<double> _chartData = List.filled(7, 0); // Generic chart data
   List<Map<String, dynamic>> _recentActivities = [];
 
@@ -975,7 +975,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   ],
                 ),
               );
-            }).toList(),
+            }),
         ],
       ),
     );

@@ -8,7 +8,7 @@ import 'dart:convert';
 import '../models/Products.dart';
 
 // Replace with your Cloudinary details
-const String cloudName = 'dbdtj0zfs';
+const String cloudName = 'draqcjajq';
 const String uploadPreset = 'hive_app';
 
 class AddProductScreen extends StatefulWidget {
@@ -649,7 +649,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                 child: Center(child: CircularProgressIndicator()),
               )
               : DropdownButtonFormField<String>(
-                value:
+                initialValue:
                     categories.contains(_selectedCategory)
                         ? _selectedCategory
                         : null,

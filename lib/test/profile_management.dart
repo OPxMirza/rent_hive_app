@@ -415,7 +415,7 @@ class _ProfileManagementScreenState extends State<ProfileManagementScreen> {
                         ),
                         const SizedBox(height: 15),
                         DropdownButtonFormField<String>(
-                          value: _selectedGender,
+                          initialValue: _selectedGender,
                           decoration: _buildInputDecoration(
                             label: 'Gender',
                             icon: Icons.transgender,

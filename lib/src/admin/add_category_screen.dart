@@ -7,7 +7,7 @@ import 'dart:convert';
 import '../models/Category.dart';
 
 // Replace with your Cloudinary details
-const String cloudName = 'dbdtj0zfs';
+const String cloudName = 'draqcjajq';
 const String uploadPreset = 'hive_app';
 
 class AddCategoryScreen extends StatefulWidget {

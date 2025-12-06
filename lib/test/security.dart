@@ -22,7 +22,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _isEmailLoading = false;
   bool _isPasswordLoading = false;
 

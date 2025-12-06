@@ -64,7 +64,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 FadeInUp(
                   duration: Duration(milliseconds: 1400),
-                  child: Container(
+                  child: SizedBox(
                     height: MediaQuery.of(context).size.height / 3,
                     child: Center(
                       child: Container(
@@ -91,7 +91,7 @@ class WelcomeScreen extends StatelessWidget {
                   children: <Widget>[
                     FadeInUp(
                       duration: Duration(milliseconds: 1500),
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton(
@@ -126,7 +126,7 @@ class WelcomeScreen extends StatelessWidget {
                     SizedBox(height: 20),
                     FadeInUp(
                       duration: Duration(milliseconds: 1600),
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: OutlinedButton(
