@@ -1,14 +1,62 @@
+# ===========================
+# Flutter / Dart
+# ===========================
+
+build/
+.dart_tool/
+.flutter-plugins
+.packages
+.pub/
+.idea/
+.vscode/
+*.iml
+
+# ===========================
+# Android
+# ===========================
+
+# Gradle files
+.gradle/
+android/.gradle/
+android/build/
 gradle-wrapper.jar
-/.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
+gradlew
+gradlew.bat
+local.properties
+
+# ===========================
+# iOS
+# ===========================
+
+ios/Pods/
+ios/build/
+ios/Podfile.lock
+
+# Xcode project files (avoid conflicts)
+ios/*.xcworkspace
+ios/*.xcodeproj/project.pbxproj
+
+# ===========================
+# Plugins / Generated
+# ===========================
+
 GeneratedPluginRegistrant.java
 .cxx/
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/to/reference-keystore
+# ===========================
+# Keys & Certificates
+# ===========================
+
+# Never upload keystore files
 key.properties
 **/*.keystore
 **/*.jks
+
+# ===========================
+# Debug & temp
+# ===========================
+
+*.log
+*.tmp
+*.swp
+.DS_Store
