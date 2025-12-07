@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -378,11 +379,127 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 20),
+
+                          // ===== Stats Grid =====
                           _buildStatsGrid(stats),
+
                           const SizedBox(height: 25),
+
+                          // ===== Chart Section =====
                           _buildChartSection(),
+
                           const SizedBox(height: 20),
-                          _buildRecentActivity(),
+
+                          // ===== Recent Activity =====
+                          _recentActivities.isEmpty
+                              ? Center(
+                                child: Text(
+                                  'No recent activities.',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              )
+                              : ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight:
+                                      300, // restrict height to avoid overflow
+                                ),
+                                child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: _recentActivities.length,
+                                  itemBuilder: (context, index) {
+                                    final activity = _recentActivities[index];
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom:
+                                            index ==
+                                                    _recentActivities.length - 1
+                                                ? 0
+                                                : 12,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: (activity['color']
+                                                      as Color)
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child:
+                                                activity['icon'] is String &&
+                                                        (activity['icon']
+                                                                as String)
+                                                            .startsWith('http')
+                                                    ? ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4,
+                                                          ),
+                                                      child: Image.network(
+                                                        activity['icon']
+                                                            as String,
+                                                        width: 24,
+                                                        height: 24,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) => const Icon(
+                                                              Icons
+                                                                  .error_outline,
+                                                              color: Colors.red,
+                                                              size: 20,
+                                                            ),
+                                                      ),
+                                                    )
+                                                    : Icon(
+                                                      activity['icon']
+                                                              is IconData
+                                                          ? activity['icon']
+                                                              as IconData
+                                                          : Icons.info,
+                                                      color:
+                                                          activity['color']
+                                                              as Color,
+                                                      size: 20,
+                                                    ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  activity['title'] as String,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  _formatTimeAgo(
+                                                    activity['time']
+                                                        as DateTime,
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                         ],
                       ),
                     ),
@@ -424,39 +541,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       ),
     );
   }
-
-  // Widget _buildSearchBar() {
-  //   return FadeTransition(
-  //     opacity: _animationController,
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.black.withOpacity(0.05),
-  //             blurRadius: 10,
-  //             offset: const Offset(0, 2),
-  //           ),
-  //         ],
-  //       ),
-  //       child: TextField(
-  //         decoration: InputDecoration(
-  //           hintText: 'Search...',
-  //           prefixIcon: const Icon(Icons.search, color: Color(0xFF6B7280)),
-  //           filled: true,
-  //           fillColor: Theme.of(context).cardColor,
-  //           border: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(16),
-  //             borderSide: BorderSide.none,
-  //           ),
-  //           contentPadding: const EdgeInsets.symmetric(
-  //             horizontal: 20,
-  //             vertical: 14,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildStatsGrid(List<Map<String, dynamic>> stats) {
     return AnimatedBuilder(
