@@ -437,7 +437,6 @@ class _RentHiveLoginState extends State<RentHiveLogin> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const RentHiveApp());
 }
 

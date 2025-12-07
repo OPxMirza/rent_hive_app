@@ -1,48 +1,55 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
-
-# IMP
-.env
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ===========================================================
+# Flutter / Dart
+# ===========================================================
+build/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.pub-cache/
+.packages
 .pub/
-/build/
+coverage/
+*.lock
 
-# Symbolication related
-app.*.symbols
+# iOS / macOS build artifacts
+**/DerivedData/
+**/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
 
-# Obfuscation related
-app.*.map.json
+# Android build
+android/app/build/
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Web
+web/.dart_tool/
+web/build/
+
+# ===========================================================
+# Editor / IDE
+# ===========================================================
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Misc
+*.log
+*.tmp
+*.swp
+.DS_Store
+.history
+.atom/
+
+# ===========================================================
+# Environment Files
+# ===========================================================
+.env
+
+# ===========================================================
+# Firebase Secret Files (DO NOT UPLOAD TO GITHUB)
+# ===========================================================
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart

@@ -14,7 +14,6 @@ const String uploadPreset = 'hive_app';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MaterialApp(home: ProfileManagementScreen()));
 }
 

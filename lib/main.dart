@@ -7,10 +7,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await dotenv.load(fileName: ".env");
-  runApp(RentHiveApp());
+
+  runApp(const RentHiveApp());
 }
+
+
 
 class RentHiveApp extends StatelessWidget {
   const RentHiveApp({super.key});
@@ -28,13 +35,6 @@ class RentHiveApp extends StatelessWidget {
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           elevation: 0,
-        ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-          elevation: 8,
         ),
       ),
       debugShowCheckedModeBanner: false,
