@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rent_hive_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:rent_hive_app/src/Pages/Home/home.dart';
 import 'package:rent_hive_app/src/Registration/signup.dart';
 

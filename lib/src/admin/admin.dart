@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rent_hive_app/firebase_options.dart';
 import 'products_listing.dart';
 import 'categories_listing.dart';
 import 'admin_orders_screen.dart';
