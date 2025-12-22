@@ -7,22 +7,6 @@ import 'package:rent_hive_app/src/Components/HomePage/SearchComponent.dart';
 import 'package:rent_hive_app/src/Pages/Structure/Structure.dart';
 import 'package:rent_hive_app/src/models/Products.dart';
 
-// void main() {
-//   runApp(const RentHiveApp());
-// }
-
-// class RentHiveApp extends StatelessWidget {
-//   const RentHiveApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       theme: ThemeData(textTheme: GoogleFonts.latoTextTheme()),
-//       home: const RentHiveHomePage(),
-//     );
-//   }
-// }
 
 class RentHiveHomePage extends StatefulWidget {
   const RentHiveHomePage({super.key});

@@ -41,7 +41,7 @@ class _BottomnavigationState extends State<Bottomnavigation> {
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
 
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
 
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,

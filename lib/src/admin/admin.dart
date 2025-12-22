@@ -593,7 +593,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(20),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(0),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
