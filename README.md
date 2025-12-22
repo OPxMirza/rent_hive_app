@@ -156,31 +156,6 @@ flutterfire configure
 
 ---
 
-## 🏗 **Development Timeline (GitHub Commit History)**
-
-You can structure your commits like:
-
-* Week 1: Project Setup
-* Week 2: Authentication Module
-* Week 3: Home Screen + Components
-* Week 4: Products + Models
-* Week 5: Wishlist + Settings
-* Week 6: Admin Panel
-* Week 7: Final UI & Bug Fixes
-
-(This matches your planned commits.)
-
----
-
-## 🎯 **Future Improvements**
-
-* Payment gateway integration
-* Push notifications
-* Order tracking
-* Enhanced animations
-* Dark mode
-
----
 
 ## 🙌 **Author**
 
