@@ -1,11 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:http_parser/http_parser.dart';
+
 import '../models/Category.dart';
-import 'package:http_parser/http_parser.dart'; // for contentType in multipart
 
 // Replace with your Cloudinary details
 const String cloudName = 'draqcjajq';
@@ -21,22 +23,34 @@ class AddCategoryScreen extends StatefulWidget {
 class _AddCategoryScreenState extends State<AddCategoryScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+
   bool _isLoading = false;
   String? _selectedIconPath;
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   List<String> availableIcons = [];
 
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     )..forward();
 
     _loadCategoryIcons();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCategoryIcons() async {
@@ -52,11 +66,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
               key.toLowerCase().endsWith('.jpeg'))
           .toList();
 
+      if (!mounted) return;
       setState(() => availableIcons = categoryIconAssets);
-
-      debugPrint('Loaded ${availableIcons.length} category icons');
     } catch (e) {
-      debugPrint('Error loading category icons: $e');
+      if (!mounted) return;
       setState(() {
         availableIcons = [
           'assets/categoryIcons/download (11).png',
@@ -67,13 +80,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
         ];
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _nameController.dispose();
-    super.dispose();
   }
 
   void _showIconGallery() {
@@ -197,37 +203,33 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
       String mimeType = 'image/png';
       final filename = _selectedIconPath!.split('/').last;
 
-      // Load from assets
       if (_selectedIconPath!.startsWith('assets/')) {
         final data = await rootBundle.load(_selectedIconPath!);
         bytes = data.buffer.asUint8List();
-        if (filename.toLowerCase().endsWith('.jpg') ||
-            filename.toLowerCase().endsWith('.jpeg')) {
-          mimeType = 'image/jpeg';
-        }
-      }
-      // Load from file
-      else if (File(_selectedIconPath!).existsSync()) {
-        final file = File(_selectedIconPath!);
-        bytes = await file.readAsBytes();
-        if (filename.toLowerCase().endsWith('.jpg') ||
-            filename.toLowerCase().endsWith('.jpeg')) {
-          mimeType = 'image/jpeg';
-        }
+      } else if (File(_selectedIconPath!).existsSync()) {
+        bytes = await File(_selectedIconPath!).readAsBytes();
       } else {
         throw Exception('Invalid icon path');
       }
 
+      if (filename.toLowerCase().endsWith('.jpg') ||
+          filename.toLowerCase().endsWith('.jpeg')) {
+        mimeType = 'image/jpeg';
+      }
+
       final uri =
           Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
+
       final request = http.MultipartRequest('POST', uri)
         ..fields['upload_preset'] = uploadPreset
-        ..files.add(http.MultipartFile.fromBytes(
-          'file',
-          bytes,
-          filename: filename,
-          contentType: MediaType('image', mimeType.split('/').last),
-        ));
+        ..files.add(
+          http.MultipartFile.fromBytes(
+            'file',
+            bytes,
+            filename: filename,
+            contentType: MediaType('image', mimeType.split('/').last),
+          ),
+        );
 
       final response = await request.send();
 
@@ -251,8 +253,38 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
     }
   }
 
+  // ✅ NEW: notify all users when category added
+  Future<void> _notifyAllUsersAboutNewCategory({
+    required String categoryId,
+    required String categoryName,
+  }) async {
+    final usersSnap = await _firestore.collection('users').get();
+    if (usersSnap.docs.isEmpty) return;
+
+    final batch = _firestore.batch();
+    final now = Timestamp.now();
+
+    for (final u in usersSnap.docs) {
+      final uid = u.id;
+
+      final notifRef = _firestore.collection('notifications').doc();
+      batch.set(notifRef, {
+        'recipientId': uid,
+        'title': 'New Category Added',
+        'body': '$categoryName category is now available',
+        'type': 'category',
+        'refId': categoryId,
+        'createdAt': now,
+        'isRead': false,
+      });
+    }
+
+    await batch.commit();
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (_selectedIconPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -269,10 +301,28 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
       final iconUrl = await _uploadIconToCloudinary();
       if (iconUrl == null) throw Exception('Failed to upload icon');
 
-      final category = Category(iconURL: iconUrl, name: _nameController.text);
-      await _firestore.collection('categories').add(category.toMap());
+      final name = _nameController.text.trim();
+
+      final category = Category(iconURL: iconUrl, name: name);
+
+      // ✅ Save category + get docId
+      final docRef =
+          await _firestore.collection('categories').add(category.toMap());
+
+      // ✅ Create notifications for all users
+      await _notifyAllUsersAboutNewCategory(
+        categoryId: docRef.id,
+        categoryName: name,
+      );
 
       if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Category added and users notified ✅'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
       Navigator.pop(context, category);
     } catch (e) {
       if (!mounted) return;
@@ -292,28 +342,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.add, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Text(
-                'Add New Category',
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        title: const Text(
+          'Add New Category',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
@@ -346,10 +377,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
 
   Widget _buildIconPicker() {
     return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(0, -0.3),
-        end: Offset.zero,
-      ).animate(
+      position: Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero)
+          .animate(
         CurvedAnimation(
           parent: _animationController,
           curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
@@ -389,8 +418,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
                   bottom: 16,
                   left: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(20),
@@ -398,7 +427,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
                     child: Text(
                       _selectedIconPath != null ? 'Selected Icon' : 'Select Icon',
                       style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w600),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -451,10 +482,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
 
   Widget _buildFormFields() {
     return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(0, 0.3),
-        end: Offset.zero,
-      ).animate(
+      position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+          .animate(
         CurvedAnimation(
           parent: _animationController,
           curve: const Interval(0.3, 0.8, curve: Curves.easeOutCubic),
@@ -466,7 +495,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
         hint: 'Enter category name',
         icon: Icons.category,
         validator: (value) =>
-            (value == null || value.isEmpty) ? 'Please enter a category name' : null,
+            (value == null || value.trim().isEmpty)
+                ? 'Please enter a category name'
+                : null,
       ),
     );
   }
@@ -512,10 +543,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
 
   Widget _buildSubmitButton() {
     return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(0, 0.3),
-        end: Offset.zero,
-      ).animate(
+      position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+          .animate(
         CurvedAnimation(
           parent: _animationController,
           curve: const Interval(0.6, 1.0, curve: Curves.easeOutCubic),
@@ -531,9 +560,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
             foregroundColor: Colors.white,
             elevation: 4,
             shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
           child: _isLoading
               ? const SizedBox(

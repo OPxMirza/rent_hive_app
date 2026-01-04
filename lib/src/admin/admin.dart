@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rent_hive_app/src/Registration/login.dart';
 import 'products_listing.dart';
 import 'categories_listing.dart';
 import 'admin_orders_screen.dart';
@@ -509,36 +510,71 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Widget _buildAppBar(bool isDarkTheme) {
-    return SliverAppBar(
-      expandedHeight: 70,
-      floating: false,
-      pinned: true,
-      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.dashboard, color: Colors.white, size: 20),
+  return SliverAppBar(
+    expandedHeight: 70,
+    floating: false,
+    pinned: true,
+    backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+
+    // ✅ ADD THIS
+   actions: [
+  IconButton(
+    tooltip: 'Logout',
+    icon: const Icon(Icons.logout),
+    onPressed: () {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(width: 12),
-            const Text(
-              'RentHive',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              },
+              child: const Text('Logout'),
             ),
           ],
         ),
+      );
+    },
+  ),
+],
+
+    flexibleSpace: FlexibleSpaceBar(
+      titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.dashboard, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          const Text(
+            'RentHive',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildStatsGrid(List<Map<String, dynamic>> stats) {
     return AnimatedBuilder(
@@ -593,7 +629,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(20),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.all(0),
+                padding: const EdgeInsets.all(16), // ✅ add padding
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -615,7 +651,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           .withOpacity(0.1),
                       blurRadius: 15,
                       offset: const Offset(0, 8),
-                      spreadRadius: 0,
                     ),
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -623,133 +658,51 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       offset: const Offset(0, 4),
                     ),
                   ],
-                  // border: Border(
-                  //   left: BorderSide(color: stat['color'] as Color, width: 4),
-                  // ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: (stat['color'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: stat['gradient'],
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          stat['icon'],
+                          color: Colors.white,
+                          size: 22,
+                        ),
                       ),
-                      child: Icon(stat['icon'], color: stat['color'], size: 22),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            gradient: stat['gradient'],
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (stat['gradient'] as LinearGradient)
-                                    .colors
-                                    .first
-                                    .withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            stat['icon'],
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: (stat['gradient'] as LinearGradient)
-                                .colors
-                                .first
-                                .withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              color:
-                                  (stat['gradient'] as LinearGradient)
-                                      .colors
-                                      .first,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          stat['label'],
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyLarge?.copyWith(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey[300]
-                                    : Colors.grey[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            stat['value'].toString(),
-                            style: Theme.of(
-                              context,
-                            ).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : const Color(0xFF1F2937),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Flexible(
-                      child: Text(
+                      const SizedBox(height: 10),
+                      Text(
                         stat['value'].toString(),
+                        textAlign: TextAlign.center,
                         style: Theme.of(
                           context,
                         ).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color:
                               (stat['gradient'] as LinearGradient).colors.first,
-                          fontSize: 24,
+                          fontSize: 26,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Flexible(
-                      child: Text(
+                      const SizedBox(height: 6),
+                      Text(
                         stat['label'],
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color:
                               Theme.of(context).brightness == Brightness.dark
                                   ? Colors.grey[300]
                                   : Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

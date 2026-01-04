@@ -464,24 +464,8 @@ class _CategoriesListingScreenState extends State<CategoriesListingScreen>
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddCategoryScreen(),
-                ),
-              );
-              if (result != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category added successfully!')),
-                );
-              }
-            },
-          ),
-        ],
+        actions: const [],
+
       ),
       body: Column(
         children: [
@@ -569,49 +553,49 @@ class _CategoriesListingScreenState extends State<CategoriesListingScreen>
           ),
           const SizedBox(width: 16),
           FadeTransition(
-            opacity: _animationController,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                HapticFeedback.lightImpact();
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddCategoryScreen(),
-                  ),
-                );
+  opacity: _animationController,
+  child: ElevatedButton(
+    onPressed: () async {
+      HapticFeedback.lightImpact();
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AddCategoryScreen(),
+        ),
+      );
 
-                if (result != null && result is Category) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${result.name} added successfully!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text(
-                'Add Category',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
-                foregroundColor: Colors.white,
-                elevation: 4,
-                shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
-                ),
-              ),
-            ),
+      if (result != null && result is Category) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${result.name} added successfully!'),
+            backgroundColor: Colors.green,
           ),
+        );
+      }
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF6366F1),
+      foregroundColor: Colors.white,
+      elevation: 4,
+      shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 14,
+      ),
+    ),
+    child: const Text(
+      'Add Category',
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+),
+
         ],
       ),
     );
